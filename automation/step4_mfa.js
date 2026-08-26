@@ -9,6 +9,18 @@ if (!CODE || !/^\d{4,8}$/.test(CODE)) {
   process.exit(1);
 }
 
+async function dumpErrors(page, label) {
+  const shot = path.join(__dirname, 'shots', `${label}.png`);
+  await page.screenshot({ path: shot, fullPage: true });
+  const bodyText = await page.locator('body').innerText().catch(() => '(falhou ao ler o texto da página)');
+  console.log(`--- ${label} ---`);
+  console.log('URL:', page.url());
+  console.log('SCREENSHOT:', shot);
+  console.log('BODY TEXT (primeiros 2000 chars):');
+  console.log(bodyText.slice(0, 2000));
+  console.log('---');
+}
+
 (async () => {
   const mfaUrl = fs.readFileSync(path.join(__dirname, 'last_url.txt'), 'utf8').trim();
 
@@ -20,9 +32,7 @@ if (!CODE || !/^\d{4,8}$/.test(CODE)) {
   const count = await digitInputs.count();
   if (count !== CODE.length) {
     console.error(`STEP_ERROR Encontrei ${count} caixas de dígito na tela, mas o código tem ${CODE.length} caracteres.`);
-    const shot = path.join(__dirname, 'shots', '04_mfa_mismatch.png');
-    await page.screenshot({ path: shot, fullPage: true });
-    console.error('SCREENSHOT:', shot);
+    await dumpErrors(page, '04_mfa_mismatch');
     await context.close();
     process.exit(1);
   }
@@ -33,14 +43,18 @@ if (!CODE || !/^\d{4,8}$/.test(CODE)) {
   }
 
   await page.waitForTimeout(500);
-  await page.getByRole('button', { name: 'Confirmar e acessar conta' }).click();
-  await page.waitForTimeout(6000);
+  await dumpErrors(page, '04a_before_submit');
 
-  const shot = path.join(__dirname, 'shots', '04_after_mfa.png');
-  await page.screenshot({ path: shot, fullPage: true });
-  console.log('URL after MFA:', page.url());
-  console.log('TITLE:', await page.title());
-  console.log('SCREENSHOT:', shot);
+  await page.getByRole('button', { name: 'Confirmar e acessar conta' }).click();
+
+  // Tira uma sequência de prints logo após o clique, pra pegar qualquer
+  // toast/popup de erro que apareça e suma rápido.
+  await page.waitForTimeout(1000);
+  await dumpErrors(page, '04b_plus1s');
+  await page.waitForTimeout(2000);
+  await dumpErrors(page, '04c_plus3s');
+  await page.waitForTimeout(3000);
+  await dumpErrors(page, '04d_plus6s');
 
   await context.close();
 })().catch((err) => {
