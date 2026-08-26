@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const { getPage } = require('./connect');
 
 const LOGIN = process.env.XPI_LOGIN;
@@ -49,6 +50,10 @@ if (!LOGIN || !SENHA) {
   console.log('URL after submit:', page.url());
   await dumpFrame(page.mainFrame(), 'main');
   console.log('SCREENSHOT:', shot);
+
+  // Salva a URL pra o próximo passo (MFA) navegar direto pra cá, sem
+  // precisar refazer o login (e sem o usuário ter que colar a URL enorme).
+  fs.writeFileSync(path.join(__dirname, 'last_url.txt'), page.url());
 
   // O profile fica salvo em disco, então o próximo passo (MFA) reabre a
   // mesma sessão em progresso mesmo depois deste processo terminar.
