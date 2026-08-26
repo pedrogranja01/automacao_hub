@@ -8,8 +8,7 @@ const PROFILE_DIR = path.join(__dirname, 'profile');
 
 async function getPage() {
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
-    headless: true,
+    headless: process.env.HEADFUL !== '1',
     acceptDownloads: true,
     viewport: { width: 1440, height: 900 },
   });
