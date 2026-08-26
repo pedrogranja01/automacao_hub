@@ -14,10 +14,13 @@ async function getPage() {
     viewport: { width: 1440, height: 900 },
     locale: 'pt-BR',
     args: ['--disable-blink-features=AutomationControlled'],
+    ignoreDefaultArgs: ['--enable-automation', '--no-sandbox'],
   });
   await context.addInitScript(() => {
     Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
   });
+  // Concede geolocalização de antemão pra evitar o popup nativo travando a página.
+  await context.grantPermissions(['geolocation']);
   const page = context.pages()[0] || (await context.newPage());
   return { context, page };
 }

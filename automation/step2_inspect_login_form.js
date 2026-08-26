@@ -4,8 +4,8 @@ const { getPage } = require('./connect');
 (async () => {
   const { context, page } = await getPage();
 
-  await page.goto('https://hub.xpi.com.br', { waitUntil: 'networkidle', timeout: 60000 });
-  await page.waitForTimeout(2000);
+  await page.goto('https://hub.xpi.com.br', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(4000);
 
   const shot = path.join(__dirname, 'shots', '02_login_form.png');
   await page.screenshot({ path: shot, fullPage: true });
