@@ -16,10 +16,17 @@ if (!LOGIN || !SENHA) {
   await page.goto('https://hub.xpi.com.br', { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(3000);
 
-  await page.locator('input[name="account"]').fill(LOGIN);
-  await page.locator('input[name="password"]').fill(SENHA);
+  const accountField = page.locator('input[name="account"]');
+  await accountField.click();
+  await page.keyboard.type(LOGIN, { delay: 90 + Math.random() * 60 });
 
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(400 + Math.random() * 300);
+
+  const passwordField = page.locator('input[name="password"]');
+  await passwordField.click();
+  await page.keyboard.type(SENHA, { delay: 90 + Math.random() * 60 });
+
+  await page.waitForTimeout(600 + Math.random() * 400);
   await page.getByRole('button', { name: 'Acessar' }).click();
 
   await page.waitForTimeout(5000);
