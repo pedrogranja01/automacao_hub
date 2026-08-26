@@ -1,0 +1,9 @@
+{
+  "name": "xp-hub-automation",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Automação de login + download de relatórios do XP Hub via Playwright",
+  "dependencies": {
+    "playwright": "^1.56.1"
+  }
+}
